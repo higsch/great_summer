@@ -9,9 +9,11 @@ getWeatherData <- function (url) {
                          header = TRUE,
                          stringsAsFactors = FALSE,
                          as.data.frame = TRUE)
-  # filter for relevant columns: temp and wind
-  table <- table[, c("Day", "T", "V")]
   # only keep rows with day-wise data (no final means etc.)
   table <- table[grep("^([1-3]|)[0-9]", table$Day), ]
+  # make interesting columns numeric
+  table <- data.frame(Day = as.numeric(table$Day),
+                      Temperature = as.numeric(table$T),
+                      Wind = as.numeric(table$V))
   return(table)
 }
