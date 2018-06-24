@@ -11,7 +11,7 @@ source("functions.R")
 # base URL for weather data download
 base_url <- "https://en.tutiempo.net/climate/05-%s/ws-24640.html"
 # years to search for
-years <- c(2008:2018)
+years <- c(1978:2018)
 
 
 # create list of data containing URLs
@@ -37,6 +37,10 @@ ggplot(data = data[which(data$Year == 2018), ]) +
 # all years
 ggplot(data = data) +
   geom_line(aes(x = Day, y = Temperature, colour = Year))
+
+# look at the temperature distribution
+ggplot(data = data) +
+  geom_histogram(aes(Temperature), binwidth = 0.3)
 
 # build median tempertures for each day
 data_wide <- reshape(data, idvar = "Day", timevar = "Year", direction = "wide")
