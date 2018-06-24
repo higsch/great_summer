@@ -11,7 +11,7 @@ source("functions.R")
 # base URL for weather data download
 base_url <- "https://en.tutiempo.net/climate/05-%s/ws-24640.html"
 # years to search for
-years <- c(1978:2018)
+years <- c(2008:2018)
 
 
 # create list of data containing URLs
@@ -39,37 +39,25 @@ ggplot(data = data) +
   geom_line(aes(x = Day, y = Temperature, colour = Year))
 
 # build median tempertures for each day
-median_data_list <- sapply(as.character(unique(data$Day)),
-                           calculateTempDayMedian,
-                           data = data,
-                           simplify = FALSE)
-median_data <- data.frame(Day = as.numeric(names(median_data_list)),
-                          Temperature = unlist(median_data_list, use.names = FALSE))
+data_wide <- reshape(data, idvar = "Day", timevar = "Year", direction = "wide")
+data_wide$median <- apply(data_wide[, 2:ncol(data_wide)],
+                   MARGIN = 1,
+                   FUN = median,
+                   na.rm = TRUE)
 
-ggplot(data = median_data) +
-  geom_line(aes(x = Day, y = Temperature)) +
+ggplot(data = data_wide) +
+  geom_line(aes(x = Day, y = median)) +
   geom_line(data = data[which(data$Year == 2018), ], aes(x = Day, y = Temperature), colour = "red")
 
 # calculate temperature differences to median
-median_diff_list <- sapply(as.character(unique(data$Day)),
-       function (d, years, data, median_data) {
-         sapply(as.character(years),
-                function (y, d, data, median_data) {
-                  data[which(data$Year == y & data$Day == d), "Temperature"] - median_data[which(median_data$Day == d), "Temperature"]
-                },
-                d = d,
-                data = data,
-                median_data = median_data,
-                simplify = FALSE)
-       },
-       years = years,
-       data = data,
-       median_data = median_data,
-       simplify = FALSE)
+data$year_median <- apply(data,
+                          MARGIN = 1,
+                          FUN = function (d, data_wide) {
+                            data_wide[which(data_wide$Day == trimws(d[["Day"]])), "median"]
+                          },
+                          data_wide = data_wide)
 
-median_diff <- rbindlist(median_diff_list, fill = TRUE, idcol = "Day")
-median_diff <- melt(median_diff, id.vars = "Day", variable.name = "Year", value.name = "Median_diff_temp")
-median_diff$Day <- as.numeric(median_diff$Day)
+data$median_diff <- data$Temperature - data$year_median
 
-ggplot(data = median_diff) +
-  geom_line(aes(x = Day, y = Median_diff_temp, colour = Year))
+ggplot(data = data) +
+  geom_line(aes(x = Day, y = median_diff, colour = Year))

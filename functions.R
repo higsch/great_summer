@@ -9,13 +9,13 @@ getWeatherData <- function (url) {
     table <- readHTMLTable(doc = tableNodes[[id]],
                            header = TRUE,
                            stringsAsFactors = FALSE,
-                           as.data.frame = TRUE)
+                           as.data.frame = TRUE,
+                           trim = TRUE)
     # only keep rows with day-wise data (no final means etc.)
     table <- table[grep("^([1-3]|)[0-9]", table$Day), ]
     # make interesting columns numeric
     table <- data.frame(Day = as.numeric(table$Day),
-                        Temperature = as.numeric(table$T),
-                        Wind = as.numeric(table$V))
+                        Temperature = as.numeric(table$T))
     return(table)
   } else {
     return(NULL)
