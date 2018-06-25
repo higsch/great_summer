@@ -13,7 +13,6 @@ base_url <- "https://en.tutiempo.net/climate/05-%s/ws-24640.html"
 # years to search for
 years <- c(1978:2018)
 
-
 # create list of data containing URLs
 urls <- sapply(as.character(years),
                function (x, base_url) {
