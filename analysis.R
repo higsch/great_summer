@@ -8,6 +8,10 @@ theme_set(theme_classic())
 
 source("functions.R")
 
+calculateTempDayMedian <- function (day, data) {
+  return(median(data[which(data$Day == day), "Temperature"], na.rm = TRUE))
+}
+
 # base URL for weather data download
 base_url <- "https://en.tutiempo.net/climate/05-%s/ws-24640.html"
 # years to search for

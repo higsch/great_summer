@@ -21,7 +21,3 @@ getWeatherData <- function (url) {
     return(NULL)
   }
 }
-
-calculateTempDayMedian <- function (day, data) {
-  return(median(data[which(data$Day == day), "Temperature"], na.rm = TRUE))
-}
