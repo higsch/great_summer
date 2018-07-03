@@ -12,26 +12,7 @@ calculateTempDayMedian <- function (day, data) {
   return(median(data[which(data$Day == day), "Temperature"], na.rm = TRUE))
 }
 
-# base URL for weather data download
-base_url <- "https://en.tutiempo.net/climate/05-%s/ws-24640.html"
-# years to search for
-years <- c(2008:2018)
-
-# create list of data containing URLs
-urls <- sapply(as.character(years),
-               function (x, base_url) {
-                 sprintf(base_url, x)
-               },
-               base_url = base_url,
-               simplify = FALSE)
-
-# fetch data
-data_list <- sapply(urls,
-                    getWeatherData,
-                    simplify = FALSE)
-
-# combine all the data
-data <- bind_rows(data_list, .id = "Year")
+data <- fetchData()
 
 # plot May 2018
 ggplot(data = data[which(data$Year == 2018), ]) +
